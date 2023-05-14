@@ -30,7 +30,6 @@ class KindlePaperwhite5Parser(RawParser):
     """
     Parser implementation for Kindle Paperwhite 5.th generation
     """
-
     def parse_raw(self, filename):
 
         with open(filename, 'r', encoding='utf-8') as file:
@@ -43,7 +42,8 @@ class KindlePaperwhite5Parser(RawParser):
         lines = data_raw.split("==========")[0:-1]
         # Append new line so all lines have \n at the beginning
         lines[0] = "\n" + lines[0]
-
+        #kahar add
+        # print("parse_raw lines:",lines)
         books_created = {}
         for edit in lines:
             # Split edit by new line
@@ -60,21 +60,62 @@ class KindlePaperwhite5Parser(RawParser):
         return books_created
 
     def create_edit(self, meta, content, book):
-        type_of_edit = meta.split(" ")[2]
+        # type_of_edit = meta.split(" ")[2]
+        #
+        # if type_of_edit.lower() == "bookmark":
+        #     edit = edit_type.BookmarkType(bookmark_string=meta)
+        #     book.bookmarks_list.append(edit)
+        #
+        # elif type_of_edit.lower() == "highlight":
+        #     edit = edit_type.HighlightType(highlight_string=meta,
+        #                                    content=content)
+        #     book.highlights_list.append(edit)
+        #
+        # else:
+        #     # It's a note type
+        #     edit = edit_type.NoteType(edit_string=meta, content=content)
+        #     book.notes_list.append(edit)
+        #
 
-        if type_of_edit.lower() == "bookmark":
-            edit = edit_type.BookmarkType(bookmark_string=meta)
-            book.bookmarks_list.append(edit)
-
-        elif type_of_edit.lower() == "highlight":
-            edit = edit_type.HighlightType(highlight_string=meta,
-                                           content=content)
-            book.highlights_list.append(edit)
-
+        #kahar start
+        if("您" in meta):#中文
+            #         print("zhongwen")
+            if  "标注" in meta:
+                # print("meta='{}'".format(meta))
+                # print("content='{}'".format(content))
+                edit = edit_type.HighlightType(highlight_string=meta,\
+                                               content=content)
+                book.highlights_list.append(edit)
+            elif "笔记" in meta:
+                # It's a note type
+                edit = edit_type.NoteType(edit_string=meta, content=content)
+                book.notes_list.append(edit)
+            elif "书签" in meta:
+                edit = edit_type.BookmarkType(bookmark_string=meta)
+                book.bookmarks_list.append(edit)
+            else:
+                print("there is exception in Chinese meta=",meta)
         else:
-            # It's a note type
-            edit = edit_type.NoteType(edit_string=meta, content=content)
-            book.notes_list.append(edit)
+            type_of_edit = meta.split(" ")[2]
+
+            if  type_of_edit.lower() == "bookmark":
+                edit = edit_type.BookmarkType(bookmark_string=meta)
+                book.bookmarks_list.append(edit)
+
+            elif type_of_edit.lower() == "highlight":
+                edit = edit_type.HighlightType(highlight_string=meta,content=content)
+                book.highlights_list.append(edit)
+
+            elif type_of_edit.lower() == "note":
+                edit = edit_type.NoteType(edit_string=meta, content=content)
+                book.notes_list.append(edit)
+            else:
+                print("there is exception in English meta={},type_of_edit={}"\
+                                                    ,meta,type_of_edit)
+
+
+
+        #kahar end
 
 
 class RawParserContext:

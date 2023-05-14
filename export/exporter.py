@@ -19,7 +19,8 @@ class Export:
         :return:
 
         """
-        return re.sub('[^a-zA-Z0-9 \n\.]', '', name).lower().replace(" ", "_")
+        # return re.sub('[^a-zA-Z0-9 \n\.]', '', name).lower().replace(" ", "_")
+        return re.sub('[\\\/:*?\"\'<>|\n\.]', '', name).lower().replace(" ", "_")
 
 
 class ExportTex(Export):
@@ -134,7 +135,7 @@ class ExportMarkdown(Export):
         start, end = book.start_finish_reading_date()
 
         with open(os.path.join(folder_path, self.format_filename(book.book_name)
-                + ".md"), "w") as file:
+                + "_"+str(start.date())+"_"+str(end.date()) +".md"), "w") as file:
 
             for index, template in enumerate(self.template):
                 if "book_title" in template:
@@ -145,15 +146,29 @@ class ExportMarkdown(Export):
                 elif "author_name" in template:
                     template = template.replace("author_name", self.author)
                     file.write(template)
-
+                #kahar start
                 elif template.startswith("$"):
                     # Insert content
-                    if not book.highlights_list:
+                    if not book.notes_list:
+                        print("{}'s note list is empty".format(book.book_name))
                         continue
+                    #kahar start
+                    for note in book.notes_list:
+                        file.write("* " + note.content + " *Location (" +
+                                   note.location + ")* " +
+                                   str(note.date) +"\n")
 
+                elif template.startswith("%"):
+                    if not book.highlights_list:
+                        print("{}'s highlight list is empty".format(book.book_name))
+                        continue
+                    #
+                    #kahar end
                     for highlight in book.highlights_list:
-                        file.write("* " + highlight.content + "*Location (" +
-                                   highlight.location + ")*\n")
+                        file.write("* " + highlight.content + " *Location (" +
+                                   # highlight.location + ")*\n")
+                                   highlight.location + ")* " +
+                                   str(highlight.date) + "\n")
 
                 elif "date_start" in template:
                     template = template.replace("date_start", str(start.date()))

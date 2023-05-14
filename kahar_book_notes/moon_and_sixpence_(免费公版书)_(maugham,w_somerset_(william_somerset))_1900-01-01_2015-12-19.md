@@ -1,7 +1,9 @@
-# book_title
-* Author: author_name
-* Started reading book: date_start
-* Finished reading book: date_end
+# Moon and Sixpence (免费公版书) (Maugham,W. Somerset (William Somerset))
+* Author: Kahar
+* Started reading book: 1900-01-01
+
+* Finished reading book: 2015-12-19
+
 
 ## About the book
 
@@ -23,8 +25,6 @@
 
 ## Book notes
 
-$ Notes_insertion
 
 ## Book highlights
 
-% Highlights_insertion

@@ -36,7 +36,23 @@ class Book:
         Extracts first and last bookmark date. Dates are sorted in chronological order and then extracted.
         :return: First and last date from the bookmark list
         """
-        dates = [item.date for item in self.bookmarks_list]
-        dates.sort()
+        # print("bookmarks:") #kahar added
+        # print(self.bookmarks_list) #kahar added
+        print("notes=",self.notes_count())
+        dates_n = [item.date for item in self.notes_list]
+        print("highlights=",self.highlights_count())
+        dates_h = [item.date for item in self.highlights_list]
+        print("bookmarks=",self.bookmarks_count())
+        dates_b = [item.date for item in self.bookmarks_list]
+        dates = dates_n + dates_h + dates_b
+        print("all mark's len=",len(dates))
+        if(len(dates)>1):
+            # dates = [item.date for item in self.bookmarks_list]
+            dates.sort()
+            # print(dates)
+            return dates[0], dates[-1]
+        elif(len(dates)==1):
+            return datetime.datetime(1900,1,1),dates[0]
 
-        return dates[0], dates[-1]
+        else:
+            return datetime.datetime(1900,1,1),datetime.datetime(1900,1,1)

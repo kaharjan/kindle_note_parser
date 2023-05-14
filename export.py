@@ -60,6 +60,27 @@ def choose_export(export_index, template_dir):
         # Plain Text
         return exporter.ExportPlain(author_name=author)
 
+def choose_export_all(author,export_index, template_dir,choose_t):
+    """
+    Choose export object based on the user input
+    :param template_dir: Templates directory path
+    :param export_index: Index which was input by user
+    :return: Export object
+    """
+    if export_index == 0:
+        # TEX
+        return exporter.ExportTex(author_name=author,
+                                  template_path=choose_t)
+    elif export_index == 1:
+        # Markdown
+        return exporter.ExportMarkdown(author_name=author,
+                                       template_path=choose_t)
+    else:
+        # Plain Text
+        return exporter.ExportPlain(author_name=author)
+
+
+
 
 def extract(book_index, books, export_dir, templates_dir):
     """
@@ -98,6 +119,40 @@ def extract(book_index, books, export_dir, templates_dir):
                                                     export_dir)
     print()
 
+def extract_all(books, export_dir, templates_dir):
+    """
+    Extracts book info
+    :param templates_dir: Templates directory path
+    :param export_dir: Book export directory
+    :param book_index: Book index (If the index is invalid, it will be skipped)
+    :param books: List of Book objects
+    :return:
+    """
+        # Ask for export format
+    print("exporting all the books...")
+    print("Choose your export format\n")
+    [print('{:5d}) {}'.format(index, ex_format)) for index, ex_format in
+     enumerate(EXPORT_FORMATS.values())]
+    user_input = int(input("Enter number from the list: "))
+
+    # Check if range is ok
+    while user_input not in range(len(EXPORT_FORMATS)):
+        print("Invalid number given. Try again.")
+        user_input = int(input("Enter number from the list: "))
+    format_exp = list(EXPORT_FORMATS.items())[user_input][0]
+    author = input(
+        "Enter your name (this will appear on the top of the document): ")
+    choose_t = choose_template(templates_dir,\
+                               extension=EXPORT_EXTENSIONS['markdown'])
+    for book_index in range(0,len(books)):
+        selected_book_name, selected_book_iterator = list(books.items())[book_index]
+        print("Exporting book: " + selected_book_name)
+
+        choose_export_all(author,format_exp, templates_dir,choose_t).export(selected_book_iterator,
+                                                    export_dir)
+    print()
+
+
 
 def check_path_exists(dir_list):
     """
@@ -134,19 +189,26 @@ def main():
     books = collections.OrderedDict(
         sorted(parser_context.parse_raw(args.input_log).items()))
 
-    # List all books
+    # List all books kahar add #of notes, highlights, bookmars
     print("Enter one or more numbers from the list\n")
-    [print('{:5d}) {}'.format(index, name)) for index, name in enumerate(books)]
+    [print('{:5d}) {} note:{} highlights:{} marks:{}'.format(index, name,
+                  books[name].notes_count(),
+                  books[name].highlights_count(),
+                  books[name].bookmarks_count())) for index, name in enumerate(books)]
 
     while True:
         try:
             user_input = set([int(item) for item in
                               input("\nEnter number(s) separated by a SINGLE "
-                                    "space: ").strip().split(" ")])
+                                    "space or -1 for all: ").strip().split(" ")])
             break
         except ValueError:
-            print("Invalid input. Please select a number(s) from the list.")
-
+               print("Invalid input. Please select a number(s) from the list.\
+                     Or -1 for all books to extract")
+    print("user_input=",list(user_input))
+    if(list(user_input)[0] == -1):
+        extract_all(books,args.output_dir,args.templates_dir)
+        return
     for book_index in user_input:
         extract(book_index, books, args.output_dir, args.templates_dir)
 

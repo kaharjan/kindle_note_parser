@@ -24,7 +24,3 @@
 ## Book notes
 
 $ Notes_insertion
-
-## Book highlights
-
-% Highlights_insertion
